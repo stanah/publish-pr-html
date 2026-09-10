@@ -37,7 +37,7 @@ runMain(async () => {
   const { comment, duplicates } = selectPublishComment(comments, { authorId });
   if (duplicates.length > 0) warning(`found ${duplicates.length} duplicate publish comment(s); updating the oldest only`);
   const existing = comment ? parseMeta(comment.body) : null;
-  const decision = decide({ existing, request, runNumber: ctx.runNumber });
+  const decision = decide({ existing, request, runNumber: ctx.runNumber, runId: ctx.runId });
   if (decision.action === 'noop' || decision.action === 'skip') return finish('skipped', decision.reason);
   if (decision.action === 'reject') throw new ValidationError(decision.reason);
 

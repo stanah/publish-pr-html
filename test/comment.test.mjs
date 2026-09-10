@@ -58,6 +58,11 @@ test('decide: state machine', () => {
   const request = { requestId: uuid, headSha: sha, htmlSha256: 'e'.repeat(64) };
   assert.equal(decide({ existing: null, request, runNumber: 5 }).action, 'proceed');
   assert.equal(decide({ existing: meta, request, runNumber: 12 }).action, 'noop');
+  // Same request from a different run id: the original artifact still exists.
+  assert.equal(decide({ existing: { ...meta, run_id: 500 }, request, runNumber: 12, runId: '501' }).action, 'noop');
+  // Same request, same run id: this is a re-run and GitHub deleted the artifact.
+  assert.equal(decide({ existing: { ...meta, run_id: 500 }, request, runNumber: 12, runId: '500' }).action, 'republish');
+  assert.equal(decide({ existing: { ...meta, run_id: 500 }, request, runNumber: 12, runId: 500 }).action, 'republish');
   assert.equal(decide({ existing: meta, request: { ...request, htmlSha256: 'f'.repeat(64) }, runNumber: 12 }).action, 'reject');
   const other = { ...request, requestId: '22222222-2222-4333-8444-555555555555' };
   assert.equal(decide({ existing: meta, request: other, runNumber: 11 }).action, 'skip');

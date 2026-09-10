@@ -104,7 +104,11 @@ PR の本文には触れません。
 
 **巻き戻りの防止**は run number で行います。
 同一 PR の run は concurrency group で直列化し、保存済みの run number より小さい run はコメントを更新しません。
-同じ request ID の再実行は何もせずに成功します。
+
+**run の再実行**では、GitHub が前回 attempt の artifact を削除します（2026-09-11 に実際の run で確認した挙動です）。
+コメントが指す run を再実行すると、action は同じ HTML を再度 artifact にしてコメントのリンクを更新します。
+inline 経路では HTML が dispatch の入力に残っているので常に再公開できます。
+release 経路では中継 asset を公開後も清掃期限まで残しているため、期限内なら再公開できます。
 
 **失敗時の扱い**は次のとおりです。
 
@@ -112,17 +116,18 @@ PR の本文には触れません。
 |---|---|
 | 検証、取得、artifact 化の失敗 | 公開失敗。既存コメントは維持し、中継 asset は清掃期限まで残る |
 | artifact 成功、コメント更新失敗 | 公開失敗。artifact と中継 asset を残し、再実行できるようにする |
-| コメント成功、asset 削除失敗 | 公開成功と清掃警告。リンクは戻さず、日次の清掃に委ねる |
 | PR の head 移動、PR の close | skip。既存コメントを維持する |
+| 清掃済みの中継 asset を指す run の再実行 | 公開失敗。CLI から再送する |
 
-清掃 workflow は、中継 release 配下で命名規則 `pr-html-{PR番号}-{SHA先頭12桁}-{request ID}.html` に一致し、asset の作成から 7 日を超えたものだけを削除します。
+中継 asset は公開直後には削除しません。
+清掃 workflow が、中継 release 配下で命名規則 `pr-html-{PR番号}-{SHA先頭12桁}-{request ID}.html` に一致し、asset の作成から 7 日を超えたものだけを削除します。
 
 ## 権限
 
 | 主体 | 必要な権限 |
 |---|---|
 | CLI | PR の読み取り、workflow の dispatch（fine-grained token では Actions の write）、run の状態確認（Actions の read）。release 経路では Contents の write |
-| publish workflow | `contents: write`（draft release の asset 取得と削除）、`pull-requests: write`（コメント作成と更新） |
+| publish workflow | `contents: write`（draft release の asset 取得）、`pull-requests: write`（コメント作成と更新） |
 | cleanup workflow | `contents: write` |
 
 action は `run:` の式に入力を埋め込まず、HTML、dispatch の payload、トークンをログに出しません。

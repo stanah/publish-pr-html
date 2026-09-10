@@ -59,7 +59,8 @@ runMain(async () => {
   if (duplicates.length > 0) warning(`found ${duplicates.length} duplicate publish comment(s); using the oldest (${comment.html_url})`);
   const existing = comment ? parseMeta(comment.body) : null;
   if (comment && !existing) warning(`existing publish comment ${comment.html_url} has no readable metadata; it will be replaced`);
-  const decision = decide({ existing, request, runNumber: ctx.runNumber });
+  const decision = decide({ existing, request, runNumber: ctx.runNumber, runId: ctx.runId });
+  if (decision.action === 'republish') warning(decision.reason);
   if (decision.action === 'noop') return finish('noop', decision.reason);
   if (decision.action === 'skip') return finish('skipped', decision.reason);
   if (decision.action === 'reject') throw new ValidationError(decision.reason);

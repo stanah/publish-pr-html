@@ -37,7 +37,7 @@ inputs:
     required: false
     default: ''
   github_token:
-    description: Token with contents:write and pull-requests:write on this repository.
+    description: Token with contents:write (draft release assets) and pull-requests:write (comments) on this repository.
     required: false
     default: ${{ github.token }}
   max_bytes:
@@ -118,15 +118,3 @@ runs:
         ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
       run: node "$PUBLISH_PR_HTML_ACTION_PATH/src/action/comment.mjs"
 
-    - id: finalize
-      name: Delete the relay asset
-      if: steps.prepare.outputs.status == 'proceed' && inputs.transport == 'release'
-      shell: bash
-      env:
-        PUBLISH_PR_HTML_ACTION_PATH: ${{ github.action_path }}
-        INPUT_TRANSPORT: ${{ inputs.transport }}
-        INPUT_ASSET_ID: ${{ inputs.asset_id }}
-        INPUT_RELEASE_ID: ${{ inputs.release_id }}
-        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
-        COMMENT_STATUS: ${{ steps.comment.outputs.status }}
-      run: node "$PUBLISH_PR_HTML_ACTION_PATH/src/action/finalize.mjs"

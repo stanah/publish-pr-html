@@ -62,13 +62,20 @@ export function buildCommentBody({ serverUrl, repo, artifactUrl, headSha, publis
 
 /**
  * Decide what a run should do given the existing comment metadata.
- * Returns {action: 'proceed' | 'noop' | 'skip' | 'reject', reason}.
+ * Returns {action: 'proceed' | 'republish' | 'noop' | 'skip' | 'reject', reason}.
+ *
+ * 'republish': the comment was written by an earlier attempt of this very run.
+ * GitHub deletes the artifacts of a run when it is re-run, so the HTML has to be
+ * uploaded again and the comment updated with the new artifact URL.
  */
-export function decide({ existing, request, runNumber }) {
+export function decide({ existing, request, runNumber, runId }) {
   if (!existing) return { action: 'proceed', reason: 'no existing comment' };
   const existingRun = Number(existing.run_number);
   if (existing.request_id === request.requestId) {
     if (existing.head_sha === request.headSha && existing.html_sha256 === request.htmlSha256) {
+      if (runId !== undefined && String(existing.run_id) === String(runId)) {
+        return { action: 'republish', reason: `run ${runId} was re-run; re-uploading the artifact deleted by the re-run` };
+      }
       return { action: 'noop', reason: `request ${request.requestId} is already published` };
     }
     return { action: 'reject', reason: `request ${request.requestId} is already published with different content` };
