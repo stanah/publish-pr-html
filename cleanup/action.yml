@@ -1,0 +1,45 @@
+name: cleanup-pr-html
+description: >-
+  Delete relay assets left on the dedicated draft release by publish-pr-html
+  requests that never completed. Only assets that follow the relay naming rule
+  and are older than max_age_days are removed.
+author: stanah
+
+inputs:
+  release_id:
+    description: Id of the dedicated draft release. Usually vars.PR_HTML_RELEASE_ID.
+    required: true
+  max_age_days:
+    description: Delete relay assets whose creation time is older than this many days.
+    required: false
+    default: '7'
+  dry_run:
+    description: When "true", report what would be deleted without deleting.
+    required: false
+    default: 'false'
+  github_token:
+    description: Token with contents:write on this repository.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  deleted:
+    description: Number of assets deleted.
+    value: ${{ steps.cleanup.outputs.deleted }}
+  failed:
+    description: Number of assets that could not be deleted.
+    value: ${{ steps.cleanup.outputs.failed }}
+
+runs:
+  using: composite
+  steps:
+    - id: cleanup
+      name: Delete expired relay assets
+      shell: bash
+      env:
+        PUBLISH_PR_HTML_ACTION_PATH: ${{ github.action_path }}
+        INPUT_RELEASE_ID: ${{ inputs.release_id }}
+        INPUT_MAX_AGE_DAYS: ${{ inputs.max_age_days }}
+        INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: node "$PUBLISH_PR_HTML_ACTION_PATH/../src/action/cleanup.mjs"

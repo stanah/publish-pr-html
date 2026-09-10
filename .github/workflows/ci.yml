@@ -1,0 +1,21 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No dependencies to install: the CLI and the action use the Node standard library only.
+      - run: node --version
+      - run: node --test 'test/**/*.test.mjs'
+      - run: node --check bin/publish-pr-html.mjs && for f in src/action/*.mjs src/lib/*.mjs; do node --check "$f"; done

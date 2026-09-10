@@ -1,0 +1,5 @@
+# Runtime and development dependencies are intentionally empty: the CLI and the
+# action use the Node.js standard library only. The settings below apply if a
+# dependency is ever added.
+minimumReleaseAge: 10080
+strictDepBuilds: true

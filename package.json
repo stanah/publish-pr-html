@@ -1,0 +1,27 @@
+{
+  "name": "publish-pr-html",
+  "version": "0.1.0",
+  "description": "Publish a generated HTML file to a pull request as a non-zipped GitHub Actions artifact, linked from a dedicated PR comment.",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "publish-pr-html": "bin/publish-pr-html.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "action.yml",
+    "cleanup",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@12.4.0",
+  "scripts": {
+    "test": "node --test 'test/**/*.test.mjs'",
+    "check": "node --check bin/publish-pr-html.mjs && for f in src/action/*.mjs src/cli/*.mjs src/lib/*.mjs; do node --check \"$f\" || exit 1; done"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
