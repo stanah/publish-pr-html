@@ -50,11 +50,10 @@ release は draft のまま維持します。
 公開状態に変えると、action は中継として使うことを拒否します。
 リポジトリ変数を API から設定できない権限の場合、`setup` は release ID を表示して終わるので、リポジトリ設定から手動で登録します。
 
-### 3. action の参照を許可する
+### 3. action の参照を確認する
 
-このリポジトリが private の間は、同じオーナー配下のリポジトリからだけ `uses:` で参照できます。
-このリポジトリの Settings から Actions の Access を「Accessible from repositories owned by the user」に設定してください。
-public にした場合、この設定は不要です。
+このリポジトリは public なので、どのリポジトリからも `uses: stanah/publish-pr-html@<sha>` で参照できます。
+fork して private で運用する場合は、fork 側の Settings で Actions の Access を「Accessible from repositories owned by the user」に設定しないと、同じオーナー配下からも参照できません。
 
 ## CLI の使い方
 
@@ -87,6 +86,7 @@ dispatch が受理されただけでは成功とみなしません。
 - `--release-id ID`：中継 release の ID を明示する。既定は環境変数 `PR_HTML_RELEASE_ID`、次にリポジトリ変数。
 - `--json`：結果を JSON で標準出力に出す。エージェントから呼ぶときに使う。
 
+`npx` の代わりに `pnpm dlx github:stanah/publish-pr-html` でも動きます。
 繰り返し使う場合は `npm install -g github:stanah/publish-pr-html` または `pnpm add -g github:stanah/publish-pr-html` で `publish-pr-html` コマンドとして入れられます。
 
 ## 動作の要点
@@ -142,6 +142,7 @@ pnpm test
 
 このリポジトリ自身の `.github/workflows/` は、action をローカル参照（`uses: ./`）で使う動作確認用です。
 他のリポジトリでは `templates/` のものを使ってください。
+[PR #1](https://github.com/stanah/publish-pr-html/pull/1) には、inline 経路と release 経路で公開したコメントが残っています。
 
 ## 構成
 

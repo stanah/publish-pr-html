@@ -2,6 +2,8 @@
 
 2026-09-11 / コーディングエージェント向け実装仕様案
 
+実装はこのリポジトリの `action.yml`、`cleanup/action.yml`、`bin/publish-pr-html.mjs` にあり、導入手順は [README](../README.md) にまとめている。
+
 ## 1. 採用方式と範囲
 
 ローカル／エージェントが生成済みのHTMLを、GitへコミットせずActions artifactへ公開し、PRの専用コメントを更新する。
