@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>publish-pr-html サンプル解説</title>
+<style>
+  :root { color-scheme: light dark; --fg: #1f2328; --bg: #ffffff; --muted: #59636e; --line: #d1d9e0; --accent: #0969da; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #e6edf3; --bg: #0d1117; --muted: #9198a1; --line: #3d444d; --accent: #4493f8; } }
+  body { margin: 0; padding: 2rem 1rem; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif; color: var(--fg); background: var(--bg); }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; border-bottom: 1px solid var(--line); padding-bottom: .4rem; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+  pre { padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 6px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid var(--line); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+  th { background: color-mix(in srgb, var(--line) 30%, transparent); }
+  .muted { color: var(--muted); font-size: .9em; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+<h1>publish-pr-html のサンプル解説</h1>
+<p class="muted">このファイルは CLI の動作確認用です。CSS はインラインで、外部リソースを参照しません。</p>
+
+<h2>この HTML が検証していること</h2>
+<table>
+  <thead><tr><th>項目</th><th>内容</th></tr></thead>
+  <tbody>
+    <tr><td>日本語</td><td>「こんにちは」「解説」などの多バイト文字を含む</td></tr>
+    <tr><td>引用符</td><td>"double" と 'single' の両方を含む</td></tr>
+    <tr><td>シェル構文</td><td><code>$(rm -rf /)</code>、<code>`whoami`</code>、<code>${HOME}</code> をそのまま含む</td></tr>
+    <tr><td>バックスラッシュ</td><td><code>C:\path\to\file</code> と <code>\n</code></td></tr>
+  </tbody>
+</table>
+
+<h2>転送の流れ</h2>
+<pre>CLI: SHA-256 を計算 → PR の head を確認 → 転送方式を判定 → dispatch
+workflow: 入力検証 → HTML 取得と検証 → 非 ZIP artifact → PR コメント更新</pre>
+
+<h2>確認ポイント</h2>
+<ol>
+  <li>PR コメントのリンクから、この HTML がブラウザでそのまま表示されること。</li>
+  <li>コメントに記載された対象コミットが、CLI に渡した SHA と一致すること。</li>
+  <li>同じ内容を再送しても、コメントが重複しないこと。</li>
+</ol>
+</main>
+</body>
+</html>
